@@ -217,7 +217,12 @@
     const cellW = maxWidth / cols;
     const cellH = maxHeight / rows;
     
-    const size = Math.floor(Math.min(cellW, cellH, 44)); 
+    let size = Math.floor(Math.min(cellW, cellH)); 
+    
+    // Ensure size is at least 32px so fingers can actually tap it on mobile!
+    if (size < 32) size = 32;
+    // Cap at 44px
+    if (size > 44) size = 44;
     
     boardEl.style.setProperty('--cell-size', `${size}px`);
   }
@@ -237,6 +242,9 @@
         el.addEventListener('mousedown', onCellMouseDown);
         el.addEventListener('mouseup',   onCellMouseUp);
         el.addEventListener('mouseleave',   onCellMouseLeave);
+        el.addEventListener('touchstart', onCellTouchStart, { passive: true });
+        el.addEventListener('touchmove', onCellTouchMove, { passive: true });
+        el.addEventListener('touchend', onCellTouchEnd);
         el.addEventListener('contextmenu', e => e.preventDefault());
 
         board[r][c].el = el;
@@ -331,6 +339,49 @@
     board[r][c].el.classList.remove('pressed');
   }
 
+  let touchTimer = null;
+  let touchMoved = false;
+  let ignoreNextMouseUp = false;
+
+  function onCellTouchStart(e) {
+    if (gameState === 'won' || gameState === 'lost') return;
+    if (e.touches.length > 1) return;
+    touchMoved = false;
+    const r = +e.currentTarget.dataset.r;
+    const c = +e.currentTarget.dataset.c;
+
+    if (!board[r][c].revealed && !board[r][c].flagged) {
+      board[r][c].el.classList.add('pressed');
+      setFace('😮');
+    }
+
+    touchTimer = setTimeout(() => {
+      if (!touchMoved && !board[r][c].revealed) {
+        handleFlag(r, c);
+        ignoreNextMouseUp = true; 
+        if(navigator.vibrate) navigator.vibrate(50);
+        board[r][c].el.classList.remove('pressed');
+        setFace('😊');
+      }
+    }, 350);
+  }
+
+  function onCellTouchMove() {
+    touchMoved = true;
+    clearPressedCells();
+    if (touchTimer) {
+      clearTimeout(touchTimer);
+      touchTimer = null;
+    }
+  }
+
+  function onCellTouchEnd() {
+    if (touchTimer) {
+      clearTimeout(touchTimer);
+      touchTimer = null;
+    }
+  }
+
   function onCellMouseUp(e) {
     if (gameState === 'won' || gameState === 'lost') return;
 
@@ -339,6 +390,11 @@
 
     clearPressedCells();
     clearChordHighlight();
+
+    if (ignoreNextMouseUp) {
+      ignoreNextMouseUp = false;
+      return;
+    }
 
     if (gameState !== 'lost' && gameState !== 'won') setFace('😊');
 
