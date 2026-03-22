@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Minesweeper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="header">
+      <div class="logo">
+        <span class="icon">🌸</span>
+        <h1>Minesweeper</h1>
+      </div>
+      <button id="btn-settings" class="icon-btn" title="Settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </header>
+
+    <!-- Difficulty Selector -->
+    <div id="difficulty-selector">
+      <button class="diff-btn" data-action="beginner">Beginner</button>
+      <button class="diff-btn" data-action="intermediate">Intermediate</button>
+      <button class="diff-btn active" data-action="expert">Expert</button>
+      <button class="diff-btn" data-action="custom">Custom</button>
+    </div>
+
+    <!-- Main Game Container -->
+    <main id="window">
+      <!-- Control Panel -->
+      <div id="panel">
+        <div class="lcd-container">
+          <div id="mine-counter" class="lcd-display">
+            <span id="mine-count">000</span>
+          </div>
+          <div class="lcd-label">MINES</div>
+        </div>
+        
+        <div class="center-controls">
+          <button id="face-btn" title="New Game">😊</button>
+        </div>
+
+        <div class="lcd-container">
+          <div id="timer-display" class="lcd-display">
+            <span id="timer-count">000</span>
+          </div>
+          <div class="lcd-label">TIME</div>
+        </div>
+      </div>
+
+      <!-- Mobile Mode Toggle -->
+      <div id="mode-toggle-container">
+        <label class="switch-outer">
+          <input type="checkbox" id="mode-toggle">
+          <div class="slider">
+            <div class="option dig-opt active">⛏️ Dig</div>
+            <div class="option flag-opt">🚩 Flag</div>
+            <div class="indicator"></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Board -->
+      <div id="board-container">
+        <div id="board"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings / Menu Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>Menu</h2>
+        <button class="close-btn" data-close="settings-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="menu-section">
+          <h3>Options</h3>
+          <label class="toggle-row">
+            <span>Marks (?)</span>
+            <input type="checkbox" id="opt-marks" checked>
+            <span class="toggle-switch"></span>
+          </label>
+        </div>
+        <div class="menu-section">
+          <h3>More</h3>
+          <button class="menu-btn" data-action="best-times">Best Times</button>
+          <button class="menu-btn" data-action="how-to">How to Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Game Dialog -->
+  <div id="custom-dialog" class="modal hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>Custom Field</h2>
+        <button class="close-btn" data-close="custom-dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Height (9-24):</label>
+          <input type="number" id="custom-height" min="9" max="24" value="16" />
+        </div>
+        <div class="form-row">
+          <label>Width (9-30):</label>
+          <input type="number" id="custom-width" min="9" max="30" value="30" />
+        </div>
+        <div class="form-row">
+          <label>Mines:</label>
+          <input type="number" id="custom-mines" min="10" max="668" value="99" />
+        </div>
+        <div class="modal-actions">
+          <button class="primary-btn" id="custom-ok">Start Game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best Times Dialog -->
+  <div id="times-dialog" class="modal hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>Fastest Sweepers</h2>
+        <button class="close-btn" data-close="times-dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="time-row">
+          <span class="diff-lb">Beginner</span>
+          <span class="diff-time" id="time-beginner">999</span>
+          <span class="diff-name" id="name-beginner">Anonymous</span>
+        </div>
+        <div class="time-row">
+          <span class="diff-lb">Intermediate</span>
+          <span class="diff-time" id="time-intermediate">999</span>
+          <span class="diff-name" id="name-intermediate">Anonymous</span>
+        </div>
+        <div class="time-row">
+          <span class="diff-lb">Expert</span>
+          <span class="diff-time" id="time-expert">999</span>
+          <span class="diff-name" id="name-expert">Anonymous</span>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" id="times-reset">Reset Scores</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner Dialog -->
+  <div id="winner-dialog" class="modal hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>Congratulations! 🏆</h2>
+      </div>
+      <div class="modal-body center-text">
+        <p id="winner-msg" class="win-text"></p>
+        <input type="text" id="winner-name" maxlength="32" value="Anonymous" placeholder="Enter your name" class="win-input" />
+        <div class="modal-actions">
+          <button class="primary-btn" id="winner-ok">Save Score</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Play Dialog -->
+  <div id="help-dialog" class="modal hidden">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>How to Play</h2>
+        <button class="close-btn" data-close="help-dialog">✕</button>
+      </div>
+      <div class="modal-body help-body">
+        <p><strong>Objective:</strong> Clear the board without detonating any mines.</p>
+        <ul>
+          <li><strong>Dig / Left Click:</strong> Reveal a cell.</li>
+          <li><strong>Flag / Right Click:</strong> Mark a suspected mine 🚩.</li>
+          <li><strong>Chord / Double Click:</strong> If a revealed number matches its surrounding flags, reveal remaining cells instantly.</li>
+        </ul>
+        <p class="tip"><strong>Mobile Tip:</strong> Use the Dig/Flag toggle below the timer to safely place flags on touch screens.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="hidden"></div>
+  <script src="game.js"></script>
+</body>
+</html>
