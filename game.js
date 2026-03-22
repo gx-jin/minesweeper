@@ -1,9 +1,115 @@
 // ============================================================
-//  Minesweeper — Morandi High-Contrast Theme + Auto-Fit Grid
+//  Minesweeper — Bilingual Morandi Edition
 // ============================================================
 
 (function () {
   'use strict';
+
+  // ── i18n Locales ───────────────────────────────────────────
+  const i18n = {
+    en: {
+      title: "Minesweeper",
+      beginner: "Beginner",
+      intermediate: "Intermediate",
+      expert: "Expert",
+      custom: "Custom",
+      mines: "MINES",
+      time: "TIME",
+      dig: "⛏️ Dig",
+      flag: "🚩 Flag",
+      menuTitle: "Menu",
+      options: "Options",
+      marks: "Marks (?)",
+      more: "More",
+      bestTimes: "Best Times",
+      howToPlay: "How to Play",
+      customTitle: "Custom Field",
+      customHeight: "Height (9-24):",
+      customWidth: "Width (9-30):",
+      customMines: "Mines:",
+      startGame: "Start Game",
+      fastestTitle: "Fastest Sweepers",
+      resetScores: "Reset Scores",
+      winTitle: "Congratulations! 🏆",
+      winPlaceholder: "Enter your name",
+      saveScore: "Save Score",
+      helpTitle: "How to Play",
+      helpObj: "<strong>Objective:</strong> Clear the board without detonating any mines.",
+      helpDig: "<strong>Dig / Left Click:</strong> Reveal a cell.",
+      helpFlag: "<strong>Flag / Right Click:</strong> Mark a suspected mine 🚩.",
+      helpChord: "<strong>Chord / Auto Reveal:</strong> Click on any revealed number whose surrounding flags match the number to instantly reveal remaining safe cells.",
+      helpTip: "<strong>Mobile Tip:</strong> Use the Dig/Flag toggle below the timer to safely place flags on touch screens.",
+      anonymous: "Anonymous",
+      winMsg: (diff) => `You secured the fastest time for ${diff}!`,
+      langToggleText: "中" // Click to switch to Chinese
+    },
+    zh: {
+      title: "扫雷",
+      beginner: "初级",
+      intermediate: "中级",
+      expert: "困难",
+      custom: "自定义",
+      mines: "地雷",
+      time: "时间",
+      dig: "⛏️ 挖开",
+      flag: "🚩 插旗",
+      menuTitle: "菜单",
+      options: "设置选项",
+      marks: "启用问号 (?)",
+      more: "更多",
+      bestTimes: "英雄榜",
+      howToPlay: "玩法说明",
+      customTitle: "自定义棋盘",
+      customHeight: "高度 (9-24)：",
+      customWidth: "宽度 (9-30)：",
+      customMines: "地雷数量：",
+      startGame: "开始游戏",
+      fastestTitle: "扫雷英雄榜",
+      resetScores: "重置成绩",
+      winTitle: "恭喜通关！🏆",
+      winPlaceholder: "输入您的名字",
+      saveScore: "保存成绩",
+      helpTitle: "游戏玩法",
+      helpObj: "<strong>游戏目标：</strong> 避开所有地雷，挖开所有安全方块。",
+      helpDig: "<strong>挖开 / 左键单击：</strong> 翻开未知方块。",
+      helpFlag: "<strong>插旗 / 右键单击：</strong> 标记疑似地雷的方块 🚩。",
+      helpChord: "<strong>高级高亮（双击排雷）：</strong> 直接点击已翻开的数字，如果周围已插旗数等于该数字，瞬间翻开周围的安全区域！",
+      helpTip: "<strong>手机端提示：</strong> 使用计时器下方的开关，即可安全轻松地切换挖开与插旗模式。",
+      anonymous: "佚名",
+      winMsg: (diff) => `太棒了！您刷新了【${diff}】的最快记录！`,
+      langToggleText: "EN" // Click to switch to English
+    }
+  };
+
+  let currentLang = localStorage.getItem('minesweeper-lang') || 'zh';
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('minesweeper-lang', lang);
+    const t = i18n[lang];
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+
+    document.getElementById('help-obj').innerHTML = t.helpObj;
+    document.getElementById('help-dig').innerHTML = t.helpDig;
+    document.getElementById('help-flag').innerHTML = t.helpFlag;
+    document.getElementById('help-chord').innerHTML = t.helpChord;
+    document.getElementById('help-tip').innerHTML = t.helpTip;
+
+    document.getElementById('winner-name').placeholder = t.winPlaceholder;
+    document.getElementById('btn-lang').textContent = t.langToggleText;
+    
+    // Update best times anonymous names if they are currently default
+    ['beginner', 'intermediate', 'expert'].forEach(key => {
+      const nmEl = document.getElementById(`name-${key}`);
+      if (nmEl.textContent === i18n.en.anonymous || nmEl.textContent === i18n.zh.anonymous) {
+        nmEl.textContent = t.anonymous;
+      }
+    });
+  }
 
   // ── Difficulty presets ─────────────────────────────────────
   const PRESETS = {
@@ -35,6 +141,7 @@
   const mineCountEl    = document.getElementById('mine-count');
   const timerEl        = document.getElementById('timer-count');
   const modeToggle     = document.getElementById('mode-toggle');
+  const langBtn        = document.getElementById('btn-lang');
 
   const confettiContainer = document.createElement('div');
   confettiContainer.id = 'confetti-container';
@@ -44,18 +151,22 @@
   window.addEventListener('resize', resizeBoard);
 
   // ── Init ───────────────────────────────────────────────────
+  applyLanguage(currentLang);
   initGame(PRESETS.expert);
   setupMenu();
   setupDialogs();
   setupFaceButton();
   setupModeToggle();
 
+  langBtn.addEventListener('click', () => {
+    applyLanguage(currentLang === 'zh' ? 'en' : 'zh');
+  });
+
   function initGame(config, keepConfig = false) {
     if(!keepConfig) {
       let r = config.rows;
       let c = config.cols;
       
-      // Auto-rotate board for portrait screens (Make the board vertical)
       if (window.innerHeight > window.innerWidth && c > r) {
         rows = c;
         cols = r;
@@ -103,11 +214,9 @@
     const maxWidth = boardContainer.clientWidth - 12; 
     const maxHeight = boardContainer.clientHeight - 12;
     
-    // Calculate max cell size to fit cleanly
     const cellW = maxWidth / cols;
     const cellH = maxHeight / rows;
     
-    // Cap at 44px so it doesn't get ridiculously large on giant screens
     const size = Math.floor(Math.min(cellW, cellH, 44)); 
     
     boardEl.style.setProperty('--cell-size', `${size}px`);
@@ -195,11 +304,8 @@
     const r = +e.currentTarget.dataset.r;
     const c = +e.currentTarget.dataset.c;
 
-    // Determine if it was chorded structurally
     const mouseButtonsDown = e.buttons !== undefined ? e.buttons : 1; 
     
-    // FIX: A single standard mouse click on a **REVEALED NUMBER** configures chords automatically!
-    // This allows very clean highlight triggering, even purely left-click without right-clicking etc.
     if ((board[r][c].revealed && board[r][c].number > 0) || mouseButtonsDown === 3 || e.button === 1 || e.detail >= 2) {
       clearChordHighlight();
       if (board[r][c].revealed && board[r][c].number > 0) {
@@ -210,7 +316,6 @@
       return;
     }
 
-    // Normal non-revealed tile click
     if (e.button === 0 || e.type === 'touchstart') {
       if (!board[r][c].revealed && !board[r][c].flagged) {
         board[r][c].el.classList.add('pressed');
@@ -237,12 +342,7 @@
 
     if (gameState !== 'lost' && gameState !== 'won') setFace('😊');
 
-    const mouseButtonsDown = e.buttons !== undefined ? e.buttons : 0;
-
-    // If chord candidate was formed on revealed numbers via single clicks, right clicks or double clicks
     if (board[r][c].revealed) {
-       // Only execute the chord if it's the actual mouse leaving or middle click/chord release!
-       // Even a single left-click on a revealed number will chord it dynamically since we enabled standard clicking interactions
        if (board[r][c].number > 0) {
           chord(r, c);
        }
@@ -250,17 +350,14 @@
     }
 
     if (e.button === 0) {
-      // Flag Mode
       if (inputMode === 'flag') {
         handleFlag(r, c);
       } else {
-        // Dig Mode
         if (board[r][c].flagged || board[r][c].question) return;
         handleReveal(r, c, 0);
       }
     } 
     else if (e.button === 2) {
-      // Right Click
       handleFlag(r, c);
     }
   }
@@ -531,9 +628,9 @@
       if (saved) return JSON.parse(saved);
     } catch (_) {}
     return {
-      beginner:     { time: 999, name: 'Anonymous' },
-      intermediate: { time: 999, name: 'Anonymous' },
-      expert:       { time: 999, name: 'Anonymous' },
+      beginner:     { time: 999, name: i18n[currentLang].anonymous },
+      intermediate: { time: 999, name: i18n[currentLang].anonymous },
+      expert:       { time: 999, name: i18n[currentLang].anonymous },
     };
   }
 
@@ -552,15 +649,20 @@
   }
 
   function showWinnerDialog(diffKey) {
-    const labels = { beginner: 'Beginner', intermediate: 'Intermediate', expert: 'Expert' };
-    document.getElementById('winner-msg').textContent =
-      `You secured the fastest time for ${labels[diffKey]} level!`;
-    document.getElementById('winner-name').value = '';
+    const dStr = i18n[currentLang][diffKey];
+    document.getElementById('winner-msg').textContent = i18n[currentLang].winMsg(dStr);
+    
+    // Auto-fill previous name if exists
+    let prevName = "";
+    if (bestTimes[diffKey].name !== i18n.en.anonymous && bestTimes[diffKey].name !== i18n.zh.anonymous) {
+      prevName = bestTimes[diffKey].name;
+    }
+    document.getElementById('winner-name').value = prevName;
 
     showDialog('winner-dialog');
 
     document.getElementById('winner-ok').onclick = () => {
-      const name = document.getElementById('winner-name').value.trim() || 'Anonymous';
+      const name = document.getElementById('winner-name').value.trim() || i18n[currentLang].anonymous;
       bestTimes[diffKey] = { time: timerValue, name };
       saveBestTimes();
       hideDialog('winner-dialog');
@@ -666,9 +768,9 @@
 
     document.getElementById('times-reset').addEventListener('click', () => {
       bestTimes = {
-        beginner:     { time: 999, name: 'Anonymous' },
-        intermediate: { time: 999, name: 'Anonymous' },
-        expert:       { time: 999, name: 'Anonymous' },
+        beginner:     { time: 999, name: i18n[currentLang].anonymous },
+        intermediate: { time: 999, name: i18n[currentLang].anonymous },
+        expert:       { time: 999, name: i18n[currentLang].anonymous },
       };
       saveBestTimes();
       populateBestTimesDialog();

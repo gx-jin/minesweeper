@@ -6,7 +6,7 @@
   <title>Minesweeper</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,20 +14,23 @@
     <!-- Header -->
     <header id="header">
       <div class="logo">
-        <span class="icon">🌸</span>
-        <h1>Minesweeper</h1>
+        <span class="icon">💣</span>
+        <h1 data-i18n="title">Minesweeper</h1>
       </div>
-      <button id="btn-settings" class="icon-btn" title="Settings">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
+      <div class="header-actions">
+        <button id="btn-lang" class="icon-btn" title="Switch Language">中</button>
+        <button id="btn-settings" class="icon-btn" title="Settings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
     </header>
 
     <!-- Difficulty Selector -->
     <div id="difficulty-selector">
-      <button class="diff-btn" data-action="beginner">Beginner</button>
-      <button class="diff-btn" data-action="intermediate">Intermediate</button>
-      <button class="diff-btn active" data-action="expert">Expert</button>
-      <button class="diff-btn" data-action="custom">Custom</button>
+      <button class="diff-btn" data-action="beginner" data-i18n="beginner">Beginner</button>
+      <button class="diff-btn" data-action="intermediate" data-i18n="intermediate">Intermediate</button>
+      <button class="diff-btn active" data-action="expert" data-i18n="expert">Expert</button>
+      <button class="diff-btn" data-action="custom" data-i18n="custom">Custom</button>
     </div>
 
     <!-- Main Game Container -->
@@ -38,7 +41,7 @@
           <div id="mine-counter" class="lcd-display">
             <span id="mine-count">000</span>
           </div>
-          <div class="lcd-label">MINES</div>
+          <div class="lcd-label" data-i18n="mines">MINES</div>
         </div>
         
         <div class="center-controls">
@@ -49,7 +52,7 @@
           <div id="timer-display" class="lcd-display">
             <span id="timer-count">000</span>
           </div>
-          <div class="lcd-label">TIME</div>
+          <div class="lcd-label" data-i18n="time">TIME</div>
         </div>
       </div>
 
@@ -58,8 +61,8 @@
         <label class="switch-outer">
           <input type="checkbox" id="mode-toggle">
           <div class="slider">
-            <div class="option dig-opt active">⛏️ Dig</div>
-            <div class="option flag-opt">🚩 Flag</div>
+            <div class="option dig-opt active" data-i18n="dig">⛏️ Dig</div>
+            <div class="option flag-opt" data-i18n="flag">🚩 Flag</div>
             <div class="indicator"></div>
           </div>
         </label>
@@ -76,22 +79,22 @@
   <div id="settings-modal" class="modal hidden">
     <div class="modal-content glass-panel">
       <div class="modal-header">
-        <h2>Menu</h2>
+        <h2 data-i18n="menuTitle">Menu</h2>
         <button class="close-btn" data-close="settings-modal">✕</button>
       </div>
       <div class="modal-body">
         <div class="menu-section">
-          <h3>Options</h3>
+          <h3 data-i18n="options">Options</h3>
           <label class="toggle-row">
-            <span>Marks (?)</span>
+            <span data-i18n="marks">Marks (?)</span>
             <input type="checkbox" id="opt-marks" checked>
             <span class="toggle-switch"></span>
           </label>
         </div>
         <div class="menu-section">
-          <h3>More</h3>
-          <button class="menu-btn" data-action="best-times">Best Times</button>
-          <button class="menu-btn" data-action="how-to">How to Play</button>
+          <h3 data-i18n="more">More</h3>
+          <button class="menu-btn" data-action="best-times" data-i18n="bestTimes">Best Times</button>
+          <button class="menu-btn" data-action="how-to" data-i18n="howToPlay">How to Play</button>
         </div>
       </div>
     </div>
@@ -101,24 +104,24 @@
   <div id="custom-dialog" class="modal hidden">
     <div class="modal-content glass-panel">
       <div class="modal-header">
-        <h2>Custom Field</h2>
+        <h2 data-i18n="customTitle">Custom Field</h2>
         <button class="close-btn" data-close="custom-dialog">✕</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
-          <label>Height (9-24):</label>
+          <label data-i18n="customHeight">Height (9-24):</label>
           <input type="number" id="custom-height" min="9" max="24" value="16" />
         </div>
         <div class="form-row">
-          <label>Width (9-30):</label>
+          <label data-i18n="customWidth">Width (9-30):</label>
           <input type="number" id="custom-width" min="9" max="30" value="30" />
         </div>
         <div class="form-row">
-          <label>Mines:</label>
+          <label data-i18n="customMines">Mines:</label>
           <input type="number" id="custom-mines" min="10" max="668" value="99" />
         </div>
         <div class="modal-actions">
-          <button class="primary-btn" id="custom-ok">Start Game</button>
+          <button class="primary-btn" id="custom-ok" data-i18n="startGame">Start Game</button>
         </div>
       </div>
     </div>
@@ -128,27 +131,27 @@
   <div id="times-dialog" class="modal hidden">
     <div class="modal-content glass-panel">
       <div class="modal-header">
-        <h2>Fastest Sweepers</h2>
+        <h2 data-i18n="fastestTitle">Fastest Sweepers</h2>
         <button class="close-btn" data-close="times-dialog">✕</button>
       </div>
       <div class="modal-body">
         <div class="time-row">
-          <span class="diff-lb">Beginner</span>
+          <span class="diff-lb" data-i18n="beginner">Beginner</span>
           <span class="diff-time" id="time-beginner">999</span>
           <span class="diff-name" id="name-beginner">Anonymous</span>
         </div>
         <div class="time-row">
-          <span class="diff-lb">Intermediate</span>
+          <span class="diff-lb" data-i18n="intermediate">Intermediate</span>
           <span class="diff-time" id="time-intermediate">999</span>
           <span class="diff-name" id="name-intermediate">Anonymous</span>
         </div>
         <div class="time-row">
-          <span class="diff-lb">Expert</span>
+          <span class="diff-lb" data-i18n="expert">Expert</span>
           <span class="diff-time" id="time-expert">999</span>
           <span class="diff-name" id="name-expert">Anonymous</span>
         </div>
         <div class="modal-actions">
-          <button class="secondary-btn" id="times-reset">Reset Scores</button>
+          <button class="secondary-btn" id="times-reset" data-i18n="resetScores">Reset Scores</button>
         </div>
       </div>
     </div>
@@ -158,13 +161,13 @@
   <div id="winner-dialog" class="modal hidden">
     <div class="modal-content glass-panel">
       <div class="modal-header">
-        <h2>Congratulations! 🏆</h2>
+        <h2 data-i18n="winTitle">Congratulations! 🏆</h2>
       </div>
       <div class="modal-body center-text">
         <p id="winner-msg" class="win-text"></p>
         <input type="text" id="winner-name" maxlength="32" value="Anonymous" placeholder="Enter your name" class="win-input" />
         <div class="modal-actions">
-          <button class="primary-btn" id="winner-ok">Save Score</button>
+          <button class="primary-btn" id="winner-ok" data-i18n="saveScore">Save Score</button>
         </div>
       </div>
     </div>
@@ -174,17 +177,17 @@
   <div id="help-dialog" class="modal hidden">
     <div class="modal-content glass-panel">
       <div class="modal-header">
-        <h2>How to Play</h2>
+        <h2 data-i18n="helpTitle">How to Play</h2>
         <button class="close-btn" data-close="help-dialog">✕</button>
       </div>
       <div class="modal-body help-body">
-        <p><strong>Objective:</strong> Clear the board without detonating any mines.</p>
+        <p id="help-obj"></p>
         <ul>
-          <li><strong>Dig / Left Click:</strong> Reveal a cell.</li>
-          <li><strong>Flag / Right Click:</strong> Mark a suspected mine 🚩.</li>
-          <li><strong>Chord / Double Click:</strong> If a revealed number matches its surrounding flags, reveal remaining cells instantly.</li>
+          <li id="help-dig"></li>
+          <li id="help-flag"></li>
+          <li id="help-chord"></li>
         </ul>
-        <p class="tip"><strong>Mobile Tip:</strong> Use the Dig/Flag toggle below the timer to safely place flags on touch screens.</p>
+        <p class="tip" id="help-tip"></p>
       </div>
     </div>
   </div>

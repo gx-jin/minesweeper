@@ -72,6 +72,12 @@ a, button {
   flex-shrink: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .logo {
   display: flex;
   align-items: center;
